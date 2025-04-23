@@ -1,0 +1,30 @@
+Start Strapi in watch mode. (Changes in Strapi project files will trigger a server restart)
+          npm run develop
+
+          Start Strapi without watch mode.
+          npm run start
+
+          Build Strapi admin panel.
+          npm run build
+
+          Deploy Strapi project.
+          npm run deploy
+
+          Seed your database with sample data.
+          npm run seed:example
+
+          Display all available commands.
+          npm run strapi
+
+          To get started run
+
+          cd D:\Projects\strapi\source\some_brand
+          npm run developdocker-compose up --build
+
+          read-only token: 1fdb69e7aa6faccb68049523db2086efe8479adae05218f17bca3ae76530947b6679e3b95bad9f86316069c3d278fa4613a9262e3db048d77fdd90721e2301ffe004ed0d14954bef8babdec0eb9180479ca9e3bc52fb3a07714fd579504a875bd644490c4ef00e7a7afa2b47f13e2e88d71be31f512761c06b9060f98a01a2d6
+
+          now i want to write a python fast api project to implement the api proxy service.
+features i want to include in it are :
+1. do request needs to authenticated with jwt token that are coming from a user logged in mobile app?
+2. need to store private keys of all brand source apis we kep.
+3. 

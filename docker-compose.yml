@@ -1,0 +1,75 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: userdb
+      MYSQL_USER: useradmin
+      MYSQL_PASSWORD: userpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    networks:
+      - internal
+
+  user-api:
+    build: ./user-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./user-api/app:/app/app
+      - ./user-api/.env:/app/.env
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --log-level debug
+    env_file:
+      - ./user-api/.env
+    depends_on:
+      - jwt-api
+    networks:
+      - internal
+
+  jwt-api:
+    build: ./jwt-api
+    volumes:
+      - ./jwt-api/app:/app/app
+      - ./jwt-api/.env:/app/.env
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8001 --log-level debug
+    env_file:
+      - ./jwt-api/.env
+    networks:
+      - internal
+  
+  api-proxy:
+    build: ./aps
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./aps/app:/app/app
+      - ./aps/.env:/app/.env
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8002 --log-level debug
+    env_file:
+      - ./aps/.env
+
+  # strapi-brand-api:
+  #   build: ./strapi
+  #   container_name: brand-source-strapi
+  #   ports:
+  #     - "1337:1337"
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_CLIENT: sqlite
+  #   volumes:
+  #     - ./strapi/source/somebrand:/app/app    #Mounts local code into container
+  #   command: yarn develop
+  #   restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  internal:
+    driver: bridge
+
