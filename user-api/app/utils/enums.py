@@ -10,7 +10,7 @@ class HeightUnit(str, Enum):
     M = "meters"
     I = "inch"
 
-class WeightUnit(str, Enum):
+class WaistUnit(str, Enum):
     KG = "kilograms"
     LBS = "pounds"
 

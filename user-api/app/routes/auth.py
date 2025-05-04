@@ -12,9 +12,9 @@ router = APIRouter()
 
 
 @router.post("/signup")
-def signup(user: UserSignup,  db: Session = Depends(get_db)):
+async def signup(user: UserSignup,  db: Session = Depends(get_db)):
 
-    result = create_user_account(db, user.email, user.password)
+    result = await create_user_account(db, user.email, user.password)
     if not result["created"]:
         raise HTTPException(status_code=500, detail=result)
 
@@ -29,47 +29,21 @@ def signup(user: UserSignup,  db: Session = Depends(get_db)):
 
     return {
         "status": 200,
-        "data": response.json()
+        "data": response.json(),
+        "user": result
     }
 
-    #
-    # get_user_by_email(db, str(user.email))
-    # result = db.execute(
-    #     text("SELECT * FROM users WHERE email = :email"),
-    #     {"email": "john@example.com"}
-    # )
-    #
-    # rows = result.fetchall()
-    # for row in rows:
-    #     print(row)
-    #
-    # if result:
-    #     print(result)
-    #     return {"message": "User already exists"}
-    #
-    # print(settings.JWT_API_URL + "/token")
-    # response = requests.post(settings.JWT_API_URL + "/token", json={
-    #     "username": user.username,
-    #     "password": user.password
-    # })
-    #
-    #
-    # if response.status_code != 200:
-    #     raise HTTPException(status_code=500, detail="Token generation failed")
-    #
-    # return response.json()
-
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = get_user_by_email(form_data.username)
-    if not user or not verify_password(form_data.password, user["hashed_password"]):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = get_user_by_email(db, form_data.username)
+    
+    if not user["exists"] or not verify_password(form_data.password, user["data"]["hashed_password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    response = requests.post(settings.JWT_API_URL + "/token", data={
+    response = requests.post(settings.JWT_API_URL + "/jwt/token", json={
         "username": form_data.username,
         "password": form_data.password
     })
-
 
     if response.status_code != 200:
         raise HTTPException(status_code=500, detail="Token generation failed")
